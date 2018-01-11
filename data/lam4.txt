@@ -1,0 +1,79 @@
+-*-mcnpgen-*- Example 6.6 Lamarsh-homog u235/water cyl,s(a,b),n+p,temperature
+c 
+c this example shows how to instruct MCNP to transport at a material temperature
+c      of 600 K (note that the density of the water in this example is not actually 
+c      changed to that of water at 600K but should be for real analysis calculations)
+c 
+c mcnp6 n=lam4
+c 
+c     cell cards
+1     1 .100207667 -1 -2 3 imp:n=1 tmp=5.170e-8 $ u235/water cylinder T=600K
+2     0 1:2:-3 imp:n=0 $ outside world
+
+c     surface cards
+1     cz  56
+2     pz  51
+3     pz -51
+
+c     data cards
+mode n p $ transport neutrons and photons
+c 
+c     material cards at 600 K
+m1     92235.81c 3.7667e-5
+       1001.81c .06677
+       1002.81c .00001
+       8016.81c .03339 $ u235/water mixture rho=1.0139g/cm3 tad=.100207667
+mt1 lwtr.26t $ lightwater s(a,b) thermal neutron treatment at 600K (appendix G)
+c 
+c tallies
+c 
+c MCNP doesn't know the source strength or normalization, it provides tally results
+c in terms of per source particle, we must supply the source strength 
+c (e.g. neutrons/sec)
+c      We know this approximately from the power level and basic fission physics:
+c For a power level of 5 watts:
+c source strength=
+c 5watt*2.4neut/fiss*1fiss/180.88MeV*1MeV/1.602e-13 wattsec=4.141e11 neut/sec
+c 
+c   We may need to iterate on some of these numbers using MCNP for consistency
+c 
+c       from keff box e.g. final estimated combined...keff
+c            average number of neutrons produced per fission = 2.436
+c 
+c 
+fc4 neutron flux in cell 1 (u235 water solution)
+f4:n 1 $ neutron flux in cell 1 (u235 water solution)
+e4 0.625e-6 0.1 20 $ bin flux into 3 energies (thermal,intermediate,fast)
+fm4 4.141e11 $ norm (neut/sec)
+fq4 f e $ change tally printout cell/surf down, ebins across top
+c 
+c 
+fc6 total heating in cell 1 units of MeV/g (note need mode n p)
+f6:n,p 1 $ total heating in cell 1
+fm6 4.141e11 $ norm (neut/sec)
+c 
+fc7 fission heating in cell 1 units of MeV/g
+f7:n 1 $ fission heating in cell 1
+fm7 4.141e11 $ norm (neut/sec)
+c 
+c a more natural unit for heating (W/cm3)
+fc16 total heating (neutron+photon) units of W/cm3 (note need mode n p)
+f16:n,p 1 $ total heating in cell 1
+sd16 1.00491E+06  $ volume of cell
+fm16 0.0663 $ norm*1.602e-13 wattsec/MeV
+c 
+c a more natural unit for heating (W/cm3)
+fc17 fission heating (neutron) units of W/cm3 
+f17:n 1 $ fission heating in cell 1
+sd17 1.00491E+06  $ volume of cell
+fm17 0.0663 $ norm*1.602e-13 wattsec/MeV
+c 
+c 
+c print tables of useful information
+print 40 98 $ mcard compositions, constants including fissionQ values by isotope
+c 
+c     Criticality Control Cards
+kcode 10000 1.0 50 250
+ksrc    0.0 0.0 -25.0 
+        0.0 0.0 0.0
+        0.0 0.0 25.0 $ 3 initial source locations

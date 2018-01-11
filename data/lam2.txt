@@ -1,0 +1,27 @@
+-*-mcnpgen-*- Example 6.6 Lamarsh-homog u235/water cylinder,s(a,b)
+c mcnp6 n=lam2
+c 
+c     cell cards
+1     1 .100207667 -1 -2 3 imp:n=1 $ u235/water cylinder
+2     0 1:2:-3 imp:n=0 $ outside world
+
+c     surface cards
+1     cz  56
+2     pz  51
+3     pz -51
+
+c     data cards
+mode n $ transport neutrons only
+c 
+c     material cards
+m1     92235.80c 3.7667e-5
+       1001.80c .06677
+       1002.80c .00001
+       8016.80c .03339 $ u235/water mixture rho=1.0139g/cm3 tad=.100207667
+mt1 lwtr.20t $ lightwater s(a,b) thermal neutron treatment 293.6K (appendix G)
+c 
+c     Criticality Control Cards
+kcode 5000 1.0 50 250
+ksrc    0.0 0.0 -25.0 
+        0.0 0.0 0.0
+        0.0 0.0 25.0 $ 3 initial source locations

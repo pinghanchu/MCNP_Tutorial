@@ -1,0 +1,12 @@
+c use mcnp6 ip i=sh2 com=plt2geo to run
+c see chapter 6.2 of the mcnp6 manual for commands
+c see appendix B of mcnp5 manual for commands
+c 
+c plot a slice at y=0 with an extent from -150 to 150 cm
+scales 1 label 1 1 cel py 0 ext 150
+c click upper left of window to redraw
+
+
+
+
+

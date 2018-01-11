@@ -1,0 +1,98 @@
+-*-mcnpgen-*- 1650MWth homog PWR,cylinder,s(a,b),meshtally,n+p,pu239prod
+c mcnp6 n=homogcore6
+c 
+c     cell cards
+1     4 0.08203797053 -1 -2 3 imp:n=1 $ homog core cylinder (water,fuel,clad,gap)
+2     2 .100368 1 -4 -2 3 imp:n=1 $ cylinder shell water reflector
+3     2 .100368 -4 -3 6 imp:n=1 $ upper water reflector
+4     2 .100368 -4 2 -5 imp:n=1 $ lower water reflector
+9     0 4:5:-6 imp:n=0 $ outside world
+
+c     surface cards
+1     cz  129.0    $ outer radius of core
+2     pz  182.88   $ top of core
+3     pz -182.88   $ bottom of core
+c 
+4     cz  168.0  $ outer radius of cyl water reflector
+5     pz  282.88 $ top of water reflector
+6     pz -282.88 $ bottom of water reflector
+
+c     data cards
+mode n p $ transport neutrons and photons
+c 
+m1      8016.80c .0468450
+       92235.80c .0007114 
+       92238.80c .0227111  $ UO2 rho=10.5g/cm3 (3w/o u-235) tad=.0702675
+m2      1001.80c .0669020
+        1002.80c .0000100
+        8016.80c .0334560        $ H2O rho=1.0g/cm3          tad=.100368
+mt2 lwtr.20t $ lightwater s(a,b) thermal neutron treatment 293.6K (appendix G)
+m3     40090.80c 0.021737625
+       40091.80c 0.004740450
+       40092.80c 0.007245875
+       40094.80c 0.007343050
+       40096.80c 0.001183000  $ pure Zr rho=6.4g/cm3         tad=0.042250
+m4      8016.80c   0.0152873973         $ vf=0.32634 fuel
+       92235.80c  0.000232158276	$ vf=0.32634
+       92238.80c  0.007411540374	$ vf=0.32634
+        1001.80c   0.03663285912	$ vf=0.54756 water
+        1002.80c   0.0000054756	        $ vf=0.54756
+        8016.80c   0.01831916736	$ vf=0.54756
+       40090.80c  0.00213485215125	$ vf=0.09821 clad
+       40091.80c  0.0004655595945	$ vf=0.09821
+       40092.80c  0.00071161738375	$ vf=0.09821
+       40094.80c  0.0007211609405	$ vf=0.09821
+       40096.80c  0.00011618243	        $ vf=0.09821  
+                                        $ homog core tad=0.08203797053
+c 
+m5     92235.80c  1	$ pure u235 for tally
+c 
+m6     92238.80c  1     $ pure u238 for tally
+c 
+c tallies
+c 
+c MCNP doesn't know the source strength or normalization, it provides tally results
+c in terms of per source particle, we must supply the source strength 
+c (e.g. neutrons/sec)
+c      We know this approximately from the power level and basic fission physics:
+c For a power level of 1650 MW:
+c source strength=
+c 1650e6watt*2.4neut/fiss*1fiss/180.88MeV*1MeV/1.602e-13 wattsec=1.367e20 neut/sec
+c 
+c   We may need to iterate on some of these numbers using MCNP for consistency
+c          (e.g. neutrons emitted/fission and MeV/fission)
+c 
+c       from keff box e.g. final estimated combined...keff
+c            average number of neutrons produced per fission = 2.436
+c       use an f7 tally to get MeV/fission
+c 
+c 
+fc4 neutron flux in cell 1 (active fuel region)
+f4:n 1 $ neutron flux in cell 1 
+e4 0.625e-6 0.1 20 $ bin flux into 3 energies (thermal,intermediate,fast)
+fm4 1.367e20 $ norm (neut/sec)
+fq4 f e $ change tally printout cell/surf down, ebins across top
+c 
+fc14 u235 fission rate in cell 1 (units=fissions/srcneutron)
+f14:n 1 $ neutron flux in cell 1 
+sd14 1 $ divisor=1 to avoid getting per cm3
+fm14 0.000232158276 5 -6 $ atom density of u235 in homog mixture,matl5,sigmafission
+c 
+fc24 u238 n-gamma rate in cell 1,(~pu239 prod. rate),units=rxns/srcneutron
+f24:n 1 $ neutron flux in cell 1 
+sd24 1 $ divisor=1 to avoid getting per cm3
+fm24 0.007411540374 6 102 $ atom density of u238 in homog mixture,matl6,sigmangamma 
+c 
+fc34 total fission rate in cell 1 (units=fissions/srcneutron)
+f34:n 1 $ neutron flux in cell 1 
+sd34 1 $ divisor=1 to avoid getting per cm3
+fm34 -1 4 -6 $ atom density of homog mixture,matl4,sigmafission
+c 
+c print tables of useful information
+print 40 98 $ mcard compositions, constants including fissionQ values by isotope
+c 
+c     Criticality Control Cards
+kcode 5000 1.0 75 250
+ksrc    0.0 0.0 -100.0 
+        0.0 0.0 0.0
+        0.0 0.0 100.0 $ 3 initial source locations

@@ -1,0 +1,64 @@
+-*-mcnpgen-*- short fuel pins in 1x17x17 pwr fuel bundle,multiple s(a,b)
+c mcnp6 n=pwrfuel11
+c 
+c     cell cards
+c fuel unit cell
+11 1 .0702675 -14 15 -11 u=1 imp:n=1 $ UO2 fuel pellet
+12 0 (-14 15 11 -12):(14 -16 -12):(-15 17 -12) u=1 imp:n=1 $ gap
+13 3 .042250 (-16 17 12 -13):(16 -18 -13):(-17 19 -13) u=1 imp:n=1 $ Zr clad
+14 2 .100368 (13:18:-19) u=1 imp:n=1 $ water surrounding
+c 
+c create an infinite array of pins
+41 0 -1 2 -7 8 -9 10 u=9 lat=1 fill=1 imp:n=1 $ array of pins,each element filled with u=1
+c 
+51 0 -1 2 -3 4 -5 6 fill=9 imp:n=1 $ large box filled with u=9 (which is an array of pins)
+c 
+98 0 -99 (1:-2:3:-4:5:-6) imp:n=1 $ void around large box  
+99 0 99 imp:n=0 $ outside world
+
+c     surface cards
+1 pz 20      $ top
+2 pz -20     $ bottom
+c  
+3 px 10.625   $ fuel assembly box boundaries
+4 px -10.625
+5 py 10.625
+6 py -10.625
+c 
+7 px .625     $ fuel pin box boundaries (unit cell)
+8 px -.625
+9 py .625
+10 py -.625
+c  
+11 cz .4095 $ pellet outer radius
+12 cz .4177 $ gap outer radius
+13 cz .47   $ clad outer radius
+14 pz 18         $ top of fuel rod
+15 pz -18        $ bottom of fuel rod
+16 pz 18.0082   $ top of gap
+17 pz -18.0082  $ bottom of gap
+18 pz 18.0654  $ top of clad
+19 pz -18.0654 $ bottom of clad
+c 
+99    so 30  $ surrounding sphere
+
+c     data cards
+c 
+c     material cards
+m1      8016.80c .0468450
+       92235.80c .0007114 
+       92238.80c .0227111  $ UO2 rho=10.5g/cm3 (3w/o u-235) tad=.0702675
+mt1 o2-u.20t u-o2.20t $ s(a,b) for m1 oxygen in uO2, u-238 in uO2
+m2      1001.80c .0669020
+        1002.80c .0000100
+        8016.80c .0334560        $ H2O rho=1.0g/cm3          tad=.100368
+mt2 lwtr.20t $ h in lightwater s(a,b) thermal neutron treatment 293.6K (appendix G)
+m3     40090.80c 0.021737625
+       40091.80c 0.004740450
+       40092.80c 0.007245875
+       40094.80c 0.007343050
+       40096.80c 0.001183000  $ pure Zr rho=6.4g/cm3         tad=0.042250
+c 
+c     Criticality Control Cards
+kcode 5000 1.0 50 250
+ksrc 0 0 0

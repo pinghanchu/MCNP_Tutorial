@@ -1,0 +1,106 @@
+-*-mcnpgen-*- Example 6.6 Lamarsh-homog u235/water cylinder,s(a,b),meshtally,n+p
+c mcnp6 n=lam3
+c 
+c     cell cards
+1     1 .100207667 -1 -2 3 imp:n=1 $ u235/water cylinder
+2     0 1:2:-3 imp:n=0 $ outside world
+
+c     surface cards
+1     cz  56
+2     pz  51
+3     pz -51
+
+c     data cards
+mode n p $ transport neutrons and photons
+c 
+c     material cards
+m1     92235.80c 3.7667e-5
+       1001.80c .06677
+       1002.80c .00001
+       8016.80c .03339 $ u235/water mixture rho=1.0139g/cm3 tad=.100207667
+mt1 lwtr.20t $ lightwater s(a,b) thermal neutron treatment at 293.6K (appendix G)
+c 
+c tallies
+c 
+c MCNP doesn't know the source strength or normalization, it provides tally results
+c in terms of per source particle, we must supply the source strength 
+c (e.g. neutrons/sec)
+c      We know this approximately from the power level and basic fission physics:
+c For a power level of 5 watts:
+c source strength=
+c 5watt*2.4neut/fiss*1fiss/180.88MeV*1MeV/1.602e-13 wattsec=4.141e11 neut/sec
+c 
+c   We may need to iterate on some of these numbers using MCNP for consistency
+c          (e.g. neutrons emitted/fission and MeV/fission)
+c 
+c       from keff box e.g. final estimated combined...keff
+c            average number of neutrons produced per fission = 2.436
+c       from tally 27 182. MeV/fission
+c So then, the norm=
+c 5watt*2.436neut/fiss*1fiss/182.MeV*1MeV/1.602e-13 wattsec= 4.177e11 neut/sec
+c 
+c 
+fc4 neutron flux in cell 1 (u235 water solution)
+f4:n 1 $ neutron flux in cell 1 (u235 water solution)
+e4 0.625e-6 0.1 20 $ bin flux into 3 energies (thermal,intermediate,fast)
+fm4 4.141e11 $ norm (neut/sec)
+fq4 f e $ change tally printout cell/surf down, ebins across top
+c 
+c 
+fc6 total heating in cell 1 units of MeV/g (note need mode n p)
+f6:n,p 1 $ total heating in cell 1
+fm6 4.141e11 $ norm (neut/sec)
+c 
+fc7 fission heating in cell 1 units of MeV/g
+f7:n 1 $ fission heating in cell 1
+fm7 4.141e11 $ norm (neut/sec)
+c 
+c a more natural unit for heating (W/cm3)
+fc16 total heating (neutron+photon) units of W/cm3 (note need mode n p)
+f16:n,p 1 $ total heating in cell 1
+sd16 1.00491E+06  $ volume of cell
+fm16 0.0663 $ norm*1.602e-13 wattsec/MeV
+c 
+c a more natural unit for heating (W/cm3)
+fc17 fission heating (neutron) units of W/cm3 
+f17:n 1 $ fission heating in cell 1
+sd17 1.00491E+06  $ volume of cell
+fm17 0.0663 $ norm*1.602e-13 wattsec/MeV
+c 
+fc27 calculate fission heating in MeV/fission in cell 1
+f27:n 1 $ calculate fission heating in cell 1
+sd27 1 $ divide by 1 to get units of MeV/srcparticle instead of default MeV/g/srcparticle
+fm27 2.4 $ multiply by "neutrons produced per fission" to get MeV/fission
+c  
+c 
+fc34 number of fission reactions in core units of fission/src neutron
+f34:n 1 $ fission in cell 1
+sd34 1 $ use tally divisor of 1 so tally not per cm3
+fm34 .100208 1 -6 $ atom density of cell, m1, sigmafission
+c 
+fc44 fission heating in core units of MeV/src neutron
+f44:n 1 $ fission heating in cell 1
+sd44 1 $ use tally divisor of 1 so tally not per gram
+fm44 .100208 1 -6 -8 $ atom density of cell, m1, sigmafission, fissionheating
+c 
+fc57 calculate fission heating in watts in cell 1 (entire core) 
+f57:n 1 $ calculate fission heating in cell 1
+sd57 1 $ volume of "cell"
+fm57 0.0663 $ norm*1.602e-13 wattsec/MeV
+c 
+c mesh tally flux (cylindrical mesh i=r,j=z,k=theta in revolutions)
+fmesh104:n geom=cyl origin=0.,0,-51. axs=0,0,1 vec=1,0,0
+          imesh=56.0 iints=7
+          jmesh=102.0 jints=8
+          kmesh=1.0 kints=1
+c mesh tally multiplier
+fm104 4.141e11 $ norm (neut/sec)
+c 
+c print tables of useful information
+print 40 98 $ mcard compositions, constants including fissionQ values by isotope
+c 
+c     Criticality Control Cards
+kcode 5000 1.0 50 250
+ksrc    0.0 0.0 -25.0 
+        0.0 0.0 0.0
+        0.0 0.0 25.0 $ 3 initial source locations

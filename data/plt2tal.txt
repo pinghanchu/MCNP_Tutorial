@@ -1,0 +1,15 @@
+c use mcnp6 z com=plt2tal to run
+c see chapter 6.3 of the mcnp6 manual for commands
+c see appendix B of mcnp5 manual for commands
+c read mctal file or runtpe file to get results after running mcnp
+rmctal=sh2m
+c plot energy bin 2 of tally12 versus surface number
+tally 12 free f fixed e 2
+xlims 0 6 6 ylims 1e-5 1e-3
+title 1 "Neutron flux SS/Water/SS (n/cm2 per nps)"
+c coplot energy bin 1 of the same tally with linlin plot
+c ylims 0 2e-4 4
+fixed e 2 linlin label "E>0.1MeV" coplot fixed e 1 label "E<0.1MeV"
+c 
+ylims 1e-6 1e-3 3 fixed e 2 linlog label "E>0.1MeV"
+fixed e 2 linlog label "E>0.1MeV" coplot fixed e 1 label "E<0.1MeV"

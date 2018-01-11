@@ -1,0 +1,11 @@
+c use mcnp6 ip i=sh3 com=plt3geo to run
+c see chapter 6.2 of the mcnp6 manual for commands
+c see appendix B of mcnp5 manual for commands
+c 
+scales 1 label 1 1 cel py 0 ext 150
+c click upper left of window to redraw
+
+
+
+
+

@@ -1,0 +1,80 @@
+-*-mcnpgen-*- 14MeV pencil beam src,cyl geometry,lanlmatls,cut0,endfb7.1
+c mcnp6 n=sh1
+c 
+c cell cards
+1 0 -10 1 -2 imp:n,p=1 $ source void
+2 0 -10 2 -3 imp:n,p=1 $ void outside source
+3 1 .085960002 -10 3 -4 imp:n,p=1 $ shield part1
+4 1 .085960002 -10 4 -5 imp:n,p=1 $ shield part2
+5 1 .085960002 -10 5 -6 imp:n,p=1 $ shield part3
+6 1 .085960002 -10 6 -7 imp:n,p=1 $ reflector material
+91 0 (-1:7:10) imp:n,p=0 $ region outside slab
+
+c surface cards
+1 pz 0 $ innermost source region boundary
+2 pz 10 $ outer source region boundary
+3 pz 50 $ start of shield
+4 pz 60 $ 
+5 pz 70 $ 
+6 pz 80 $ end of shield
+7 pz 120 $ end of reflector matl
+10 cz 100 $ outer cylindrical boundary of slab
+
+c data sections
+c 
+c 
+mode n p  $ transport neutrons and photons
+c 
+c source term......pencil beam point source monoenergetic.........
+  sdef pos=0 0 5         $ reference position
+       vec=0 0 1         $ reference vector (+z direction)
+       dir=1     $ mu=cos of angle between vec and particle direction
+       erg=14.1          $ source energy
+       par=1             $ particle type is neutrons
+c end of source term.......................................................
+c 
+c materials and cross section libraries (use endf/b-vii.1 at 293K .80c)
+c 
+m1
+        14028.80c   0.001567910
+        14029.80c   0.000079390
+        14030.80c   0.000052700
+        24050.80c   0.000677386
+        24052.80c   0.013062705
+        24053.80c   0.001481206
+        24054.80c   0.000368704
+        25055.80c   0.00174
+        26054.80c   0.003244520
+        26056.80c   0.051308168
+        26057.80c   0.001230680
+        26058.80c   0.000156632
+        28058.80c   0.006637508
+        28060.80c   0.002556743
+        28061.80c   0.000111150
+        28062.80c   0.000354315
+        28064.80c   0.000090285
+        42092.80c   0.000184016
+        42094.80c   0.000114700
+        42095.80c   0.000197408
+        42096.80c   0.000206832
+        42097.80c   0.000118420
+        42098.80c   0.000299212
+        42100.80c   0.000119412   $ lanlss316 rho=7.92 tad=.085960002
+c 
+c tallies
+c surface crossings
+f11:n 3 4 5 6 7 $ front of sh,middle of sh, back of sh,back of refector
+e11 .1 20 100 t $ bin into energy bins and total
+fq11 f e $ change tally printout-surf down,ebins across top
+c 
+c surface tallies
+f12:n 3 4 5 6 7 $ front of sh,middle of sh, back of sh,back of refector
+e12 .1 20 100 t $ bin into energy bins and total
+fq12 f e $ change tally printout-surf down,ebins across top
+c 
+c print source,materials, and first 50 histories
+print 10 40 110
+c 
+nps  1e5
+c  dump frequency,write mctal file
+prdmp j 1e4 1
