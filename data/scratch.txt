@@ -1,0 +1,25 @@
+-*-mcnpgen-*- empty scratch
+c mcnp6 n=scratch.txt
+c 
+c Cell Cards 
+1 0 (-1:2:-3:4:-5:6) $outer void
+2 1 0.8 1 -2 3 4 -5 6 -7:8:-9:10:-11:12
+3 2 0.2 7 -8 9 -10 11 -12
+
+c surface cards
+1 px -10
+2 px 10
+3 py -10
+4 py 10
+5 pz -10
+6 pz 10
+7 px -5
+8 px 5
+9 py -5
+10 py 5
+11 pz -5
+12 pz 5
+
+c data cards
+m1 05000 0.8 06000 0.2
+m2 05010 0.6 05011 0.2 06000 0.2

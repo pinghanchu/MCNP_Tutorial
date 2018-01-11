@@ -1,0 +1,17 @@
+-*-mcnpgen-*- empty scratch
+c mcnp6 n=scratch
+c 
+c Cell Cards 
+1 0 (-1:2:-3:4:-5:6)
+2 0 1 -2 3 -4 5 -6
+
+c surface cards
+1 px -5
+2 px 5
+3 py -5
+4 py 5
+5 pz -5
+6 pz 5
+
+c data cards
+
